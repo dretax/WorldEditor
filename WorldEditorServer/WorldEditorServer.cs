@@ -1,12 +1,14 @@
 ﻿using System;
 using Fougerite;
 using RustBuster2016Server;
+using UnityEngine;
 
 namespace WorldEditorServer
 {
     public class WorldEditorServer : Fougerite.Module
     {
         private bool _FoundRB;
+        public static string AssetPath = "file:///";
         
         public override string Name
         {
@@ -15,7 +17,7 @@ namespace WorldEditorServer
 
         public override string Author
         {
-            get { return "DreTaX"; }
+            get { return "DreTaX & Salva"; }
         }
 
         public override string Description
@@ -31,6 +33,8 @@ namespace WorldEditorServer
         public override void Initialize()
         {
             Hooks.OnModulesLoaded += OnModulesLoaded;
+            AssetPath = AssetPath + @Util.GetRootFolder() + "\\Save\\WorldEditorServer\\myasset.unity3d";
+            RustBuster2016Server.API.AddFileToDownload(new RBDownloadable("WorldEditor\\", Util.GetRootFolder() + "\\Save\\WorldEditorServer\\myasset.unity3d"));
         }
 
         public override void DeInitialize()
@@ -40,6 +44,7 @@ namespace WorldEditorServer
             {
                 RustBuster2016Server.API.OnRustBusterUserMessage -= OnRustBusterUserMessage;
             }
+            Caching.CleanCache();
         }
 
         private void OnModulesLoaded()

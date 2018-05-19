@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using RustBuster2016;
 using RustBuster2016.API;
 using RustBuster2016.API.Events;
+using UnityEngine;
 using Hooks = RustBuster2016.API.Hooks;
 
 namespace WorldEditor
@@ -11,8 +13,16 @@ namespace WorldEditor
     public class WorldEditor : RustBuster2016.API.RustBusterPlugin
     {
         private bool IsAdmin = false;
-        private bool Enabled = false;
+        private static WorldEditor _inst;
+        internal bool Enabled = false;
+        
         public IniParser SavedData;
+        public static string AssetPath = "file://";
+        public GameObject MainHolder;
+        public LoadingHandler Handler;
+        public Editor Editor;
+        public List<string> Prefabs = new List<string>();
+        public List<LoadingHandler.LoadObjectFromBundle> AllSpawnedObjects = new List<LoadingHandler.LoadObjectFromBundle>();
         
         public override string Name
         {
@@ -21,12 +31,17 @@ namespace WorldEditor
 
         public override string Author
         {
-            get { return "DreTaX"; }
+            get { return "DreTaX & Salva"; }
         }
 
         public override Version Version
         {
             get { return new Version("1.0"); }
+        }
+        
+        public static WorldEditor Instance
+        {
+            get { return _inst; }
         }
 
         public override void DeInitialize()
@@ -35,10 +50,12 @@ namespace WorldEditor
             Enabled = false;
             RustBuster2016.API.Hooks.OnRustBusterClientPluginsLoaded -= Loaded;
             RustBuster2016.API.Hooks.OnRustBusterClientChat -= OnRustBusterClientChat;
+            Caching.CleanCache();
         }
-
+        
         public override void Initialize()
         {
+            _inst = this;
             if (!Directory.Exists(RustBuster2016.API.Hooks.GameDirectory + "\\RB_Data\\WorldEditor"))
             {
                 Directory.CreateDirectory(RustBuster2016.API.Hooks.GameDirectory + "\\RB_Data\\WorldEditor");
@@ -51,13 +68,27 @@ namespace WorldEditor
             RustBuster2016.API.Hooks.OnRustBusterClientPluginsLoaded += Loaded;
             RustBuster2016.API.Hooks.OnRustBusterClientChat += OnRustBusterClientChat;
             
-            //todo: load each section to the world, add editable, and moving functions.
-        }
+            AssetPath = AssetPath + @RustBuster2016.API.Hooks.GameDirectory + "\\RB_Data\\WorldEditor\\myasset.unity3d";
+            MainHolder = new GameObject();
+            Handler = MainHolder.AddComponent<LoadingHandler>();
+            UnityEngine.Object.DontDestroyOnLoad(Handler);
+            try
+            {
+                Handler.StartCoroutine(Handler.LoadAsset());
+            }
+            catch (Exception ex)
+            {
+                RustBuster2016.API.Hooks.LogData("WorldEditor", "Exception: " + ex);
+            }
 
+            Editor = MainHolder.AddComponent<Editor>();
+        }
+        
         private void OnRustBusterClientChat(ChatEvent ce)
         {
             if (ce.ChatUI.textInput.Text.Contains("/worldedit"))
             {
+                //todo admin check
                 if (ce.ChatUI.textInput.Text == "/worldedit")
                 {
                     Enabled = !Enabled;
