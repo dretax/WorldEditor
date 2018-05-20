@@ -100,7 +100,7 @@ namespace WorldEditor
         {
             if (ce.ChatUI.textInput.Text.Contains("/worldedit"))
             {
-                ce.Cancel(true);
+                //ce.Cancel(true);
                 if (!IsAdmin)
                 {
                     return;
@@ -110,7 +110,7 @@ namespace WorldEditor
                     Enabled = !Enabled;
                     Rust.Notice.Inventory("", "WorldEdit Toggled: " + Enabled);
                 }
-                else
+                /*else
                 {
                     string[] args = ce.ChatUI.textInput.Text.Split(new string[] { "/worldedit"}, StringSplitOptions.None)[1].Split(' ');
                     if (args.Length > 0)
@@ -125,7 +125,7 @@ namespace WorldEditor
                                 break;
                         }
                     }
-                }
+                }*/
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.IO;
 using UnityEngine;
 
 namespace WorldEditor
@@ -10,21 +11,14 @@ namespace WorldEditor
 
         public GameObject ourobject;
         public LoadObjectFromBundle Spawner;
-
-        /// <summary>
-        /// Put here all your saved objects from the file like the example is.
-        /// Please don't forget to remove all of the objects that are here by default.
-        /// </summary>
-        internal readonly string[] MyDefinedObjects = new string[]
-        {
-            "personal_transport_helicopter:6308.106,360.2357,-4514.635:0,0,0,1:1,1,1",
-            "personal_transport_helicopter:6317.337,360.2363,-4523.314:0,0,0,1:1,1,1",
-            "personal_transport_helicopter:6323.524,360.2387,-4528.035:0,0,0,1:1,1,1",
-        };
         
         private void LoadAllSetObjects()
         {
-            foreach (string line in MyDefinedObjects)
+            if (!File.Exists(RustBuster2016.API.Hooks.GameDirectory + "\\RB_Data\\WorldEditor\\ClientSideAssets.txt"))
+            {
+                return;
+            }
+            foreach (string line in File.ReadAllLines(RustBuster2016.API.Hooks.GameDirectory + "\\RB_Data\\WorldEditor\\ClientSideAssets.txt"))
             {
                 if (string.IsNullOrEmpty(line))
                 {

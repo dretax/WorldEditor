@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Fougerite;
 using RustBuster2016Server;
 using UnityEngine;
@@ -37,8 +38,13 @@ namespace WorldEditorServer
             Caching.expirationDelay = 1;
             Caching.CleanCache();
             Hooks.OnModulesLoaded += OnModulesLoaded;
+            if (!File.Exists(Util.GetRootFolder() + "\\Save\\WorldEditorServer\\ClientSideAssets.txt"))
+            {
+                File.Create(Util.GetRootFolder() + "\\Save\\WorldEditorServer\\ClientSideAssets.txt").Dispose();
+            }
             AssetPath = AssetPath + @Util.GetRootFolder() + "\\Save\\WorldEditorServer\\myasset.unity3d";
             RustBuster2016Server.API.AddFileToDownload(new RBDownloadable("WorldEditor\\", Util.GetRootFolder() + "\\Save\\WorldEditorServer\\myasset.unity3d"));
+            RustBuster2016Server.API.AddFileToDownload(new RBDownloadable("WorldEditor\\", Util.GetRootFolder() + "\\Save\\WorldEditorServer\\ClientSideAssets.txt"));
             
             MainHolder = new GameObject();
             Handler = MainHolder.AddComponent<LoadingHandler>();
