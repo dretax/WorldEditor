@@ -80,8 +80,6 @@ namespace WorldEditor
             {
                 RustBuster2016.API.Hooks.LogData("WorldEditor", "Exception: " + ex);
             }
-
-            Editor = MainHolder.AddComponent<Editor>();
         }
         
         private void OnRustBusterClientChat(ChatEvent ce)

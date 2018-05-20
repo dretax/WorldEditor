@@ -32,12 +32,25 @@ namespace WorldEditor
                 {
                     continue;
                 }
+                GameObject go = new GameObject();
+                LoadObjectFromBundle lo = go.AddComponent<LoadObjectFromBundle>();
+                // Test if we can create the object. If not, it's probably not a prefab so we don't need it.
+                bool b = lo.Create(item.name, new Vector3(0, 0, 0), new Quaternion(0, 0, 0, 0), new Vector3(1, 1, 1));
+                if (!b)
+                {
+                    UnityEngine.Object.Destroy(go);
+                    continue;
+                }
+                UnityEngine.Object.Destroy(lo.ObjectInstantiate);
+                UnityEngine.Object.Destroy(go);
 
                 if (!WorldEditor.Instance.Prefabs.Contains(item.name))
                 {
                     WorldEditor.Instance.Prefabs.Add(item.name);
                 }
             }
+
+            WorldEditor.Instance.Editor = WorldEditor.Instance.MainHolder.AddComponent<Editor>();
         }
         
         public class LoadObjectFromBundle : MonoBehaviour
@@ -48,7 +61,7 @@ namespace WorldEditor
             private Quaternion _rot;
             private Vector3 _siz;
 
-            public void Create(string name, Vector3 pos, Quaternion rot, Vector3 siz)
+            public bool Create(string name, Vector3 pos, Quaternion rot, Vector3 siz)
             {
                 _name = name;
                 _pos = pos;
@@ -61,12 +74,15 @@ namespace WorldEditor
                     {
                         _ObjectInstantiate.transform.localScale = siz;
                         _ObjectInstantiate = (GameObject) Instantiate(_ObjectInstantiate, _pos, _rot);
+                        return true;
                     }
                 }
-                catch (Exception ex)
+                catch
                 {
-                    RustBuster2016.API.Hooks.LogData("CustomObjects", "Exception: " + ex);
+                    // ignore
                 }
+
+                return false;
             }
             
             public GameObject ObjectInstantiate

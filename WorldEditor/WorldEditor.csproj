@@ -56,6 +56,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ComboBox.cs" />
     <Compile Include="Editor.cs" />
     <Compile Include="LoadingHandler.cs" />
     <Compile Include="WorldEditor.cs" />

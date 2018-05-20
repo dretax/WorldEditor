@@ -14,6 +14,10 @@ namespace WorldEditor
         public static GUIStyle style1 = new GUIStyle();
         public static GUIStyle style2 = new GUIStyle();
         public Texture2D texture;
+        
+        GUIContent[] comboBoxList;
+        private ComboBox comboBoxControl;// = new ComboBox();
+        private GUIStyle listStyle = new GUIStyle();
 
         public void Start()
         {
@@ -43,7 +47,23 @@ namespace WorldEditor
             style2.fontSize = Screen.height * 2 / 110;
             style2.richText = true;
             style2.alignment = TextAnchor.MiddleCenter;
-            style2.normal.textColor = Color.blue;
+            style2.normal.textColor = Color.yellow;
+            
+            comboBoxList = new GUIContent[WorldEditor.Instance.Prefabs.Count];
+            for (int i = 0; i < comboBoxList.Length; i++)
+            {
+                comboBoxList[i] = new GUIContent(WorldEditor.Instance.Prefabs[i]);
+            }
+ 
+            listStyle.normal.textColor = Color.white; 
+            listStyle.onHover.background =
+            listStyle.hover.background = new Texture2D(2, 2);
+            listStyle.padding.left =
+            listStyle.padding.right =
+            listStyle.padding.top =
+            listStyle.padding.bottom = 4;
+            
+            comboBoxControl = new ComboBox(new Rect(Screen.width / 2, Screen.height - Screen.height + 25, 100, 20), comboBoxList[0], comboBoxList, "button", "box", listStyle);
         }
 
         public void Update()
@@ -252,13 +272,17 @@ namespace WorldEditor
 
                 if (Input.GetKey(KeyCode.KeypadMinus))
                 {
+                    if (SpawnedObject.ObjectInstantiate.transform.localScale == Vector3.zero)
+                    {
+                        return;
+                    }
                     if (Input.GetKey(KeyCode.RightControl))
                     {
-                        SpawnedObject.ObjectInstantiate.transform.localScale -= new Vector3(0.1f, 0.1f, 0.1f); //SIZE +
+                        SpawnedObject.ObjectInstantiate.transform.localScale -= new Vector3(0.1f, 0.1f, 0.1f); //SIZE -
                     }
                     else
                     {
-                        SpawnedObject.ObjectInstantiate.transform.localScale -= new Vector3(0.01f, 0.01f, 0.01f); //SIZE +
+                        SpawnedObject.ObjectInstantiate.transform.localScale -= new Vector3(0.01f, 0.01f, 0.01f); //SIZE -
                     }
                 }
             }
@@ -271,90 +295,132 @@ namespace WorldEditor
                 return;
             }
 
-            Vector3 playerloc = Camera.main.ViewportToWorldPoint(transform.localPosition);
-            var playerlocX = playerloc.x;
-            var playerlocY = playerloc.y;
-            var playerlocZ = playerloc.z;
-
-            
-            if (SpawnedObject != null && SpawnedObject.ObjectInstantiate != null)
+            try
             {
-                GUI.Label(new Rect(0, Screen.height - 100, Screen.width, 20), "POS:" 
-                                                                              + SpawnedObject.ObjectInstantiate.transform.position.ToString() 
-                                                                              + " ROT:" + SpawnedObject.ObjectInstantiate.transform.rotation.ToString() 
-                                                                              + " Size:" + SpawnedObject.ObjectInstantiate.transform.localScale.ToString(), style2);
-            }
-
-            if (ShowList)
-            {
-                Grid = GUI.SelectionGrid(new Rect(130, 10, Screen.width - 150, Screen.height - 150), Grid, WorldEditor.Instance.Prefabs.ToArray(), 10, style1);
-            }
+                Vector3 playerloc = Camera.main.ViewportToWorldPoint(transform.localPosition);
 
 
-            GUI.Box(new Rect(0, 120, 140, 90), "Object Spawn");
-            GUI.Label(new Rect(10, 140, 120, 20), string.Format("<b><color=#298A08>" + WorldEditor.Instance.Prefabs.ToArray()[Grid] + "</color></b> "));
-
-            
-            if (GUI.Button(new Rect(10, 160, 120, 20), "Spawn"))
-            {
-                try
-                {
-                    TempGameObject = new GameObject();
-                    SpawnedObject = TempGameObject.AddComponent<LoadingHandler.LoadObjectFromBundle>();
-                    SpawnedObject.Create(WorldEditor.Instance.Prefabs.ToArray()[Grid], new Vector3(playerloc.x + 10f, playerloc.y, playerloc.z + 10f), new Quaternion(0, 0, 0, 0), new Vector3(1, 1, 1));
-                    UnityEngine.Object.DontDestroyOnLoad(TempGameObject);
-                    Screen.lockCursor = true;
-                }
-                catch (Exception ex)
-                {
-                }
-            }
-            if (GUI.Button(new Rect(10, 180, 120, 20), "Destroy"))
-            {
                 if (SpawnedObject != null && SpawnedObject.ObjectInstantiate != null)
                 {
-                    UnityEngine.Object.Destroy(SpawnedObject.ObjectInstantiate);
-                    SpawnedObject = null;
-                    UnityEngine.Object.Destroy(TempGameObject);
-                    TempGameObject = null;
+                    Collider collider = SpawnedObject.ObjectInstantiate.collider;
+                    bool hascollider = false;
+                    if (collider != null)
+                    {
+                        hascollider = SpawnedObject.ObjectInstantiate
+                            .collider.enabled;
+                    }
+                    GUI.Label(new Rect(0, Screen.height - 100, Screen.width, 20), "POS:"
+                                                                                  + SpawnedObject.ObjectInstantiate
+                                                                                      .transform.position.ToString()
+                                                                                  + " ROT:" + SpawnedObject
+                                                                                      .ObjectInstantiate.transform
+                                                                                      .rotation.ToString()
+                                                                                  + " Size:" +
+                                                                                  SpawnedObject.ObjectInstantiate
+                                                                                      .transform.localScale.ToString()
+                                                                                  + " Col: " +
+                                                                                  hascollider, style2);
                 }
-            }
 
-            GUI.Box(new Rect(0, 310, 140, 120), "Object Control");
-
-            if (GUI.Button(new Rect(10, 360, 120, 20), "To Me"))
-            {
-                if (SpawnedObject != null && SpawnedObject.ObjectInstantiate != null)
+                string prefab = "";
+                if (ShowList)
                 {
-                    SpawnedObject.ObjectInstantiate.transform.position = playerloc;
+                    int selectedItemIndex = comboBoxControl.Show();
+                    if (comboBoxList[selectedItemIndex] != null)
+                    {
+                        prefab = comboBoxList[selectedItemIndex].text;
+                    }
+
+                    //GUI.Label(new Rect(130, 10, Screen.width - 150, Screen.height - 150), "dfdsfYou picked " + comboBoxList[selectedItemIndex].text + "!" );
+                    //Grid = GUI.SelectionGrid(new Rect(130, 10, Screen.width - 150, Screen.height - 150), Grid, WorldEditor.Instance.Prefabs.ToArray(), 10, style1);
                 }
-            }
-            if (GUI.Button(new Rect(10, 380, 120, 20), "Reset Rot"))
-            {
-                if (SpawnedObject != null && SpawnedObject.ObjectInstantiate != null)
+
+                GUI.Box(new Rect(0, 120, 140, 90), "Object Spawn");
+                GUI.Label(new Rect(10, 140, 120, 20), string.Format("<b><color=#298A08>" + prefab + "</color></b> "));
+
+
+                if (GUI.Button(new Rect(10, 160, 120, 20), "Spawn"))
                 {
-                    SpawnedObject.ObjectInstantiate.transform.rotation = new Quaternion(0, 0, 0, 1);
+                    try
+                    {
+                        TempGameObject = new GameObject();
+                        SpawnedObject = TempGameObject.AddComponent<LoadingHandler.LoadObjectFromBundle>();
+                        SpawnedObject.Create(WorldEditor.Instance.Prefabs.ToArray()[Grid],
+                            new Vector3(playerloc.x + 10f, playerloc.y, playerloc.z + 10f), new Quaternion(0, 0, 0, 0),
+                            new Vector3(1, 1, 1));
+                        UnityEngine.Object.DontDestroyOnLoad(TempGameObject);
+                        Screen.lockCursor = true;
+                    }
+                    catch (Exception ex)
+                    {
+                    }
                 }
+
+                if (GUI.Button(new Rect(10, 180, 120, 20), "Destroy"))
+                {
+                    if (SpawnedObject != null && SpawnedObject.ObjectInstantiate != null)
+                    {
+                        UnityEngine.Object.Destroy(SpawnedObject.ObjectInstantiate);
+                        SpawnedObject = null;
+                        UnityEngine.Object.Destroy(TempGameObject);
+                        TempGameObject = null;
+                    }
+                }
+
+                GUI.Box(new Rect(0, 310, 140, 120), "Object Control");
+
+                if (GUI.Button(new Rect(10, 360, 120, 20), "To Me"))
+                {
+                    if (SpawnedObject != null && SpawnedObject.ObjectInstantiate != null)
+                    {
+                        SpawnedObject.ObjectInstantiate.transform.position = playerloc;
+                    }
+                }
+
+                if (GUI.Button(new Rect(10, 380, 120, 20), "Reset Rot"))
+                {
+                    if (SpawnedObject != null && SpawnedObject.ObjectInstantiate != null)
+                    {
+                        SpawnedObject.ObjectInstantiate.transform.rotation = new Quaternion(0, 0, 0, 1);
+                    }
+                }
+
+                if (GUI.Button(new Rect(10, 400, 120, 20), "Collider"))
+                {
+                    if (SpawnedObject != null && SpawnedObject.ObjectInstantiate != null)
+                    {
+                        Collider collider = SpawnedObject.ObjectInstantiate.collider;
+                        if (collider != null)
+                        {
+                            SpawnedObject.ObjectInstantiate.collider.enabled =
+                                !SpawnedObject.ObjectInstantiate.collider.enabled;
+                        }
+                    }
+                }
+
+                const string a = "LIST (LControl + LAlt)" + "\n \n" +
+                                 "POSx + (Key 1)" + "\n" +
+                                 "POSx - (Key 2)" + "\n" +
+                                 "POSz + (Key 4)" + "\n" +
+                                 "POSz - (Key 5)" + "\n" +
+                                 "POSy + (Key 7)" + "\n" +
+                                 "POSy - (Key 8)" + "\n \n" +
+
+                                 "ROTx + (UP)" + "\n" +
+                                 "ROTx - (DOWN)" + "\n" +
+                                 "ROTy + (LEFT)" + "\n" +
+                                 "ROTy - (RIGTH)" + "\n \n" +
+                                 "ROTz + (Key 3)" + "\n" +
+                                 "ROTz - (Key Intro)" + "\n \n" +
+
+                                 "SIZE + (Key *)" + "\n" +
+                                 "SIZE - (Key -)";
+                GUI.Label(new Rect(10, 430, 600, 600), a);
             }
-            
-            const string a = "LIST (LControl + LAlt)" + "\n \n" +
-                    "POSx + (Key 1)" + "\n" +
-                    "POSx - (Key 2)" + "\n" +
-                    "POSz + (Key 4)" + "\n" +
-                    "POSz - (Key 5)" + "\n" +
-                    "POSy + (Key 7)" + "\n" +
-                    "POSy - (Key 8)" + "\n \n" +
-
-                    "ROTx + (UP)" + "\n" +
-                    "ROTx - (DOWN)" + "\n" +
-                    "ROTy + (LEFT)" + "\n" +
-                    "ROTy - (RIGTH)" + "\n \n" +
-                    "ROTz + (Key 3)" + "\n" +
-                    "ROTz - (Key Intro)" + "\n \n" +
-
-                    "SIZE + (Key *)" + "\n" +
-                    "SIZE - (Key -)";
-            GUI.Label(new Rect(10, 450, 600, 600), a);
+            catch (Exception ex)
+            {
+                RustBuster2016.API.Hooks.LogData("Error", "Something is wrong with the gui: " + ex);
+            }
         }
     }
 }
