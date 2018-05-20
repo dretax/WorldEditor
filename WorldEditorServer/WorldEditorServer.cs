@@ -9,6 +9,8 @@ namespace WorldEditorServer
     {
         private bool _FoundRB;
         public static string AssetPath = "file:///";
+        public GameObject MainHolder;
+        public LoadingHandler Handler;
         
         public override string Name
         {
@@ -37,6 +39,18 @@ namespace WorldEditorServer
             Hooks.OnModulesLoaded += OnModulesLoaded;
             AssetPath = AssetPath + @Util.GetRootFolder() + "\\Save\\WorldEditorServer\\myasset.unity3d";
             RustBuster2016Server.API.AddFileToDownload(new RBDownloadable("WorldEditor\\", Util.GetRootFolder() + "\\Save\\WorldEditorServer\\myasset.unity3d"));
+            
+            MainHolder = new GameObject();
+            Handler = MainHolder.AddComponent<LoadingHandler>();
+            UnityEngine.Object.DontDestroyOnLoad(Handler);
+            try
+            {
+                Handler.StartCoroutine(Handler.LoadAsset());
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Couroutine failed. " + ex);
+            }
         }
 
         public override void DeInitialize()

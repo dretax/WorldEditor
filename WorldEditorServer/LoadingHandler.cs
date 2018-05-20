@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
+using Fougerite;
 using UnityEngine;
 
-namespace WorldEditor
+namespace WorldEditorServer
 {
     public class LoadingHandler : MonoBehaviour
     {
@@ -10,7 +10,7 @@ namespace WorldEditor
 
         public GameObject ourobject;
         public LoadObjectFromBundle Spawner;
-
+        
         /// <summary>
         /// Put here all your saved objects from the file like the example is.
         /// Please don't forget to remove all of the objects that are here by default.
@@ -69,19 +69,18 @@ namespace WorldEditor
                 }
                 catch
                 {
-                    RustBuster2016.API.Hooks.LogData("Error", "Failure to load: " + line);
+                    Logger.LogError("[WorldEditorServer] Failure to load: " + line);
                 }
             }
         }
 
         public IEnumerator LoadAsset()
         {
-            WWW www = WWW.LoadFromCacheOrDownload(WorldEditor.AssetPath, 1);
+            WWW www = WWW.LoadFromCacheOrDownload(WorldEditorServer.AssetPath, 1);
             yield return www;
             if (www.error != null)
             {
-                RustBuster2016.API.Hooks.LogData("WorldEditor", "www: " + www.error);
-                //return;
+                Logger.LogError("[WorldEditorServer] Failure to load www: " + www.error);
             }
             bundle = www.assetBundle;
             www.Dispose();
@@ -91,30 +90,9 @@ namespace WorldEditor
             
             foreach (UnityEngine.Object item in bundle.LoadAll())
             {
-                if (item.name.ToLower().Contains("mat") || item.name.ToLower().Contains("avatar") || item.name.ToLower().Contains("img"))
-                {
-                    continue;
-                }
-                GameObject go = new GameObject();
-                LoadObjectFromBundle lo = go.AddComponent<LoadObjectFromBundle>();
-                // Test if we can create the object. If not, it's probably not a prefab so we don't need it.
-                bool b = lo.Create(item.name, new Vector3(0, 0, 0), new Quaternion(0, 0, 0, 0), new Vector3(1, 1, 1));
-                if (!b)
-                {
-                    UnityEngine.Object.Destroy(go);
-                    continue;
-                }
-                UnityEngine.Object.Destroy(lo.ObjectInstantiate);
-                UnityEngine.Object.Destroy(go);
-
-                if (!WorldEditor.Instance.Prefabs.Contains(item.name))
-                {
-                    WorldEditor.Instance.Prefabs.Add(item.name);
-                }
+                
             }
-
-            LoadAllSetObjects();
-            WorldEditor.Instance.Editor = WorldEditor.Instance.MainHolder.AddComponent<Editor>();
+            bundle.Unload(false);
         }
         
         public class LoadObjectFromBundle : MonoBehaviour
@@ -138,7 +116,6 @@ namespace WorldEditor
                     {
                         _ObjectInstantiate.transform.localScale = siz;
                         _ObjectInstantiate = (GameObject) Instantiate(_ObjectInstantiate, _pos, _rot);
-                        WorldEditor.Instance.AllSpawnedObjects.Add(this);
                         //CustomObjectIdentifier id = _ObjectInstantiate.collider.gameObject.AddComponent<CustomObjectIdentifier>();
                         //id.BundleClass = this;
                         return true;
