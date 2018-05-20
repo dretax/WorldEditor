@@ -74,6 +74,9 @@ namespace WorldEditor
                     {
                         _ObjectInstantiate.transform.localScale = siz;
                         _ObjectInstantiate = (GameObject) Instantiate(_ObjectInstantiate, _pos, _rot);
+                        WorldEditor.Instance.AllSpawnedObjects.Add(this);
+                        //CustomObjectIdentifier id = _ObjectInstantiate.collider.gameObject.AddComponent<CustomObjectIdentifier>();
+                        //id.BundleClass = this;
                         return true;
                     }
                 }

@@ -32,6 +32,8 @@ namespace WorldEditorServer
 
         public override void Initialize()
         {
+            Caching.expirationDelay = 1;
+            Caching.CleanCache();
             Hooks.OnModulesLoaded += OnModulesLoaded;
             AssetPath = AssetPath + @Util.GetRootFolder() + "\\Save\\WorldEditorServer\\myasset.unity3d";
             RustBuster2016Server.API.AddFileToDownload(new RBDownloadable("WorldEditor\\", Util.GetRootFolder() + "\\Save\\WorldEditorServer\\myasset.unity3d"));
@@ -44,6 +46,8 @@ namespace WorldEditorServer
             {
                 RustBuster2016Server.API.OnRustBusterUserMessage -= OnRustBusterUserMessage;
             }
+
+            Caching.expirationDelay = 1;
             Caching.CleanCache();
         }
 

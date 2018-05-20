@@ -6,6 +6,7 @@
       <e p="packages" t="ExcludeRecursive" />
       <e p="WorldEditor" t="IncludeRecursive">
         <e p="bin" t="ExcludeRecursive" />
+        <e p="ComboBox.cs" t="Include" />
         <e p="Editor.cs" t="Include" />
         <e p="LoadingHandler.cs" t="Include" />
         <e p="obj" t="ExcludeRecursive" />

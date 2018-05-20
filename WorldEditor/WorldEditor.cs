@@ -16,13 +16,13 @@ namespace WorldEditor
         private static WorldEditor _inst;
         internal bool Enabled = false;
         
-        public IniParser SavedData;
         public static string AssetPath = "file://";
         public GameObject MainHolder;
         public LoadingHandler Handler;
         public Editor Editor;
         public List<string> Prefabs = new List<string>();
         public List<LoadingHandler.LoadObjectFromBundle> AllSpawnedObjects = new List<LoadingHandler.LoadObjectFromBundle>();
+        public string SavedObjectsPath;
         
         public override string Name
         {
@@ -50,21 +50,35 @@ namespace WorldEditor
             Enabled = false;
             RustBuster2016.API.Hooks.OnRustBusterClientPluginsLoaded -= Loaded;
             RustBuster2016.API.Hooks.OnRustBusterClientChat -= OnRustBusterClientChat;
+            foreach (var x in AllSpawnedObjects)
+            {
+                if (x.ObjectInstantiate != null)
+                {
+                    UnityEngine.Object.Destroy(x.ObjectInstantiate);
+                }
+            }
+            UnityEngine.Object.Destroy(MainHolder);
+            AllSpawnedObjects.Clear();
+            Caching.expirationDelay = 1;
             Caching.CleanCache();
         }
         
         public override void Initialize()
         {
+            Caching.expirationDelay = 1;
+            Caching.CleanCache();
             _inst = this;
             if (!Directory.Exists(RustBuster2016.API.Hooks.GameDirectory + "\\RB_Data\\WorldEditor"))
             {
                 Directory.CreateDirectory(RustBuster2016.API.Hooks.GameDirectory + "\\RB_Data\\WorldEditor");
             }
-            if (!File.Exists(RustBuster2016.API.Hooks.GameDirectory + "\\RB_Data\\WorldEditor\\Objects.ini"))
+
+            SavedObjectsPath = RustBuster2016.API.Hooks.GameDirectory + "\\RB_Data\\WorldEditor\\Objects.txt";
+            if (!File.Exists(SavedObjectsPath))
             {
-                File.Create(RustBuster2016.API.Hooks.GameDirectory + "\\RB_Data\\WorldEditor\\Objects.ini").Dispose();
+                File.Create(SavedObjectsPath).Dispose();
             }
-            SavedData = new IniParser(RustBuster2016.API.Hooks.GameDirectory + "\\RB_Data\\WorldEditor\\Objects.ini");
+            
             RustBuster2016.API.Hooks.OnRustBusterClientPluginsLoaded += Loaded;
             RustBuster2016.API.Hooks.OnRustBusterClientChat += OnRustBusterClientChat;
             
@@ -86,7 +100,11 @@ namespace WorldEditor
         {
             if (ce.ChatUI.textInput.Text.Contains("/worldedit"))
             {
-                //todo admin check
+                ce.Cancel(true);
+                if (!IsAdmin)
+                {
+                    return;
+                }
                 if (ce.ChatUI.textInput.Text == "/worldedit")
                 {
                     Enabled = !Enabled;
