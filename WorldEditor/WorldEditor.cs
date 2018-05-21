@@ -16,7 +16,7 @@ namespace WorldEditor
         private static WorldEditor _inst;
         internal bool Enabled = false;
         
-        public static string AssetPath = "file://";
+        public static string AssetPath;
         public GameObject MainHolder;
         public LoadingHandler Handler;
         public Editor Editor;
@@ -36,7 +36,7 @@ namespace WorldEditor
 
         public override Version Version
         {
-            get { return new Version("1.0"); }
+            get { return new Version("1.1"); }
         }
         
         public static WorldEditor Instance
@@ -65,6 +65,7 @@ namespace WorldEditor
         
         public override void Initialize()
         {
+            AssetPath = "file:///";
             Caching.expirationDelay = 1;
             Caching.CleanCache();
             _inst = this;

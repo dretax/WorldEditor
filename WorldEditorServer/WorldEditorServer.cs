@@ -9,7 +9,7 @@ namespace WorldEditorServer
     public class WorldEditorServer : Fougerite.Module
     {
         private bool _FoundRB;
-        public static string AssetPath = "file:///";
+        public static string AssetPath;
         public GameObject MainHolder;
         public LoadingHandler Handler;
         
@@ -30,11 +30,12 @@ namespace WorldEditorServer
 
         public override Version Version
         {
-            get { return new Version("1.0"); }
+            get { return new Version("1.1"); }
         }
 
         public override void Initialize()
         {
+            AssetPath = "file:///";
             Caching.expirationDelay = 1;
             Caching.CleanCache();
             Hooks.OnModulesLoaded += OnModulesLoaded;
@@ -66,6 +67,7 @@ namespace WorldEditorServer
             {
                 RustBuster2016Server.API.OnRustBusterUserMessage -= OnRustBusterUserMessage;
             }
+            UnityEngine.Object.Destroy(MainHolder);
 
             Caching.expirationDelay = 1;
             Caching.CleanCache();
