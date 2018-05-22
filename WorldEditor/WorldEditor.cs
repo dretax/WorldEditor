@@ -36,7 +36,7 @@ namespace WorldEditor
 
         public override Version Version
         {
-            get { return new Version("1.1"); }
+            get { return new Version("1.1.1"); }
         }
         
         public static WorldEditor Instance
@@ -59,6 +59,10 @@ namespace WorldEditor
             }
             UnityEngine.Object.Destroy(MainHolder);
             AllSpawnedObjects.Clear();
+            if (LoadingHandler.bundle != null) 
+            {
+                LoadingHandler.bundle.Unload(true); // Unload all objects from the bundle.
+            }
             Caching.expirationDelay = 1;
             Caching.CleanCache();
         }

@@ -41,7 +41,7 @@ namespace WorldEditor
             listStyle.padding.top =
             listStyle.padding.bottom = 4;
             
-            comboBoxControl = new ComboBox(new Rect(Screen.width / 2, Screen.height - Screen.height + 25, 100, 20), comboBoxList[0], comboBoxList, "button", "box", listStyle);
+            comboBoxControl = new ComboBox(new Rect(Screen.width / 2, Screen.height - Screen.height + 25, 200, 30), comboBoxList[0], comboBoxList, "button", "box", listStyle);
         }
 
         public void Update()
@@ -599,22 +599,22 @@ namespace WorldEditor
                 }
 
                 const string a = "LIST (LControl + LAlt)" + "\n \n" +
-                                 "POSx + (Key 1)" + "\n" +
-                                 "POSx - (Key 2)" + "\n" +
-                                 "POSz + (Key 4)" + "\n" +
-                                 "POSz - (Key 5)" + "\n" +
-                                 "POSy + (Key 7)" + "\n" +
-                                 "POSy - (Key 8)" + "\n \n" +
+                                 "POSx + (NUMPAD 1)" + "\n" +
+                                 "POSx - (NUMPAD 2)" + "\n" +
+                                 "POSz + (NUMPAD 4)" + "\n" +
+                                 "POSz - (NUMPAD 5)" + "\n" +
+                                 "POSy + (NUMPAD 7)" + "\n" +
+                                 "POSy - (NUMPAD 8)" + "\n \n" +
 
                                  "ROTx + (UP)" + "\n" +
                                  "ROTx - (DOWN)" + "\n" +
                                  "ROTy + (LEFT)" + "\n" +
                                  "ROTy - (RIGTH)" + "\n \n" +
-                                 "ROTz + (Key 3)" + "\n" +
-                                 "ROTz - (Key Intro)" + "\n \n" +
+                                 "ROTz + (NUMPAD 3)" + "\n" +
+                                 "ROTz - (NUMPAD Intro)" + "\n \n" +
 
-                                 "SIZE + (Key *)" + "\n" +
-                                 "SIZE - (Key -)";
+                                 "SIZE + (NUMPAD *)" + "\n" +
+                                 "SIZE - (NUMPAD -)";
                 GUI.Label(new Rect(10, 430, 600, 600), a);
             }
             catch (Exception ex)

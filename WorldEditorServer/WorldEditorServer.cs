@@ -30,7 +30,7 @@ namespace WorldEditorServer
 
         public override Version Version
         {
-            get { return new Version("1.1"); }
+            get { return new Version("1.1.1"); }
         }
 
         public override void Initialize()
@@ -58,6 +58,11 @@ namespace WorldEditorServer
             {
                 Logger.LogError("Couroutine failed. " + ex);
             }
+
+            if (_FoundRB)
+            {
+                RustBuster2016Server.API.OnRustBusterUserMessage += OnRustBusterUserMessage;
+            }
         }
 
         public override void DeInitialize()
@@ -68,6 +73,10 @@ namespace WorldEditorServer
                 RustBuster2016Server.API.OnRustBusterUserMessage -= OnRustBusterUserMessage;
             }
             UnityEngine.Object.Destroy(MainHolder);
+            if (LoadingHandler.bundle != null) 
+            {
+                LoadingHandler.bundle.Unload(true); // Unload all objects from the bundle.
+            }
 
             Caching.expirationDelay = 1;
             Caching.CleanCache();
