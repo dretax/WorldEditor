@@ -312,7 +312,7 @@ namespace WorldEditor
                 }
 
                 GUI.Box(new Rect(0, 60, 140, 90), "Object Spawn");
-                GUI.Label(new Rect(10, 80, 120, 20), string.Format("<b><color=#298A08>" + prefab + "</color></b> "));
+                GUI.Label(new Rect(Screen.width / 2, Screen.height - Screen.height + 10, 200, 30), string.Format("<b><color=#298A08>" + prefab + "</color></b> "));
 
 
                 if (GUI.Button(new Rect(10, 80, 120, 20), "Spawn"))
@@ -321,7 +321,7 @@ namespace WorldEditor
                     {
                         TempGameObject = new GameObject();
                         SpawnedObject = TempGameObject.AddComponent<LoadingHandler.LoadObjectFromBundle>();
-                        SpawnedObject.Create(WorldEditor.Instance.Prefabs.ToArray()[Grid],
+                        SpawnedObject.Create(prefab,
                             new Vector3(playerloc.x + 10f, playerloc.y, playerloc.z + 10f), new Quaternion(0f, 0f, 0f, 0f),
                             new Vector3(1f, 1f, 1f));
                         UnityEngine.Object.DontDestroyOnLoad(TempGameObject);

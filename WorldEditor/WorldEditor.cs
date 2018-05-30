@@ -36,7 +36,7 @@ namespace WorldEditor
 
         public override Version Version
         {
-            get { return new Version("1.1.1"); }
+            get { return new Version("1.1.2"); }
         }
         
         public static WorldEditor Instance
