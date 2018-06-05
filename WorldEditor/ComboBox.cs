@@ -8,6 +8,7 @@
         private static int useControlID = -1;
         private bool isClickedComboButton = false;
         private int selectedItemIndex = 0;
+        private Vector2 scrollViewVector =  Vector2.zero;
 
         private Rect rect;
         private GUIContent buttonContent;
@@ -57,7 +58,7 @@
                         done = true;
                     }
                 }
-                    break;
+                break;
             }
 
             if (GUI.Button(rect, buttonContent, buttonStyle))
@@ -79,13 +80,21 @@
 
             if (isClickedComboButton)
             {
+                float itemsheight = listStyle.CalcHeight(listContent[0], 1.0f) * (listContent.Length + 5);
                 Rect listRect = new Rect(rect.x, rect.y + listStyle.CalcHeight(listContent[0], 1.0f),
                     rect.width, listStyle.CalcHeight(listContent[0], 1.0f) * listContent.Length);
+                
+                scrollViewVector = GUI.BeginScrollView (new Rect (rect.x, rect.y + rect.height, rect.width * 1.4f, 200), scrollViewVector,
+                    new Rect (rect.x, rect.y, rect.width, itemsheight + rect.height), false, false);
 
                 GUI.Box(listRect, "", boxStyle);
                 int newSelectedItemIndex = GUI.SelectionGrid(listRect, selectedItemIndex, listContent, 1, listStyle);
                 if (newSelectedItemIndex != selectedItemIndex)
+                {
                     selectedItemIndex = newSelectedItemIndex;
+                    done = true;
+                }
+                GUI.EndScrollView();
             }
 
             if (done)
