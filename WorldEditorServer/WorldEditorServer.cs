@@ -45,7 +45,7 @@ namespace WorldEditorServer
             }
             AssetPath = AssetPath + @Util.GetRootFolder() + "\\Save\\WorldEditorServer\\myasset.unity3d";
             
-            RustBuster2016Server.API.AddFileToDownload(new RBDownloadable("WorldEditor\\", Util.GetRootFolder() + "\\Save\\WorldEditorServer\\myasset.unity3d"));	            RustBuster2016Server.API.AddFileToDownload(new RBDownloadable("myasset.unity3d", "WorldEditor\\", Util.GetRootFolder() + "\\Save\\WorldEditorServer\\myasset.unity3d", "524857840D0C8CE921BC7E711E7CB9F931085231", false));
+            RustBuster2016Server.API.AddFileToDownload(new RBDownloadable("WorldEditor\\", Util.GetRootFolder() + "\\Save\\WorldEditorServer\\myasset.unity3d"));
             RustBuster2016Server.API.AddFileToDownload(new RBDownloadable("WorldEditor\\", Util.GetRootFolder() + "\\Save\\WorldEditorServer\\ClientSideAssets.txt"));
             
             MainHolder = new GameObject();
